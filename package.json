@@ -4,7 +4,9 @@
   "description": "Programming training project",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev"
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start"
   },
   "author": "",
   "license": "MIT",
