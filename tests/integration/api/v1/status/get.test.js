@@ -9,5 +9,5 @@ test("GET to /apip/v1/status should return 200", async () => {
 
   expect(resBody.dependencies.database.version).toEqual("16.8");
   expect(resBody.dependencies.database.max_connections).toEqual(100);
-  expect(resBody.dependencies.database.open_connections).toEqual(1);
+  expect(resBody.dependencies.database.opened_connections).toEqual(1);
 });
