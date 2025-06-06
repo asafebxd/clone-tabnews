@@ -18,7 +18,7 @@ async function waitForAllServices() {
       try {
         const response = await fetch("http://localhost:3000/api/v1/status");
 
-        if (response.ok) {
+        if (!response.ok) {
           throw new Error(`HTTP error ${response.status}`);
         }
         await response.json();
