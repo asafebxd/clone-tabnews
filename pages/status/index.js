@@ -20,8 +20,6 @@ function DataResponse() {
     refreshInterval: 2000,
   });
 
-  console.log("data: ", data);
-
   let updatedAtText = "Carregando...";
   let version = "Carregando...";
   let maxConnections = "Carregando...";
