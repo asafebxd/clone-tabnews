@@ -11,9 +11,8 @@ const defaultMigrationOptions = {
 
 async function listPendingMigrations() {
   let dbClient;
-
   try {
-    const dbClient = await database.getNewClient();
+    dbClient = await database.getNewClient();
     console.log("GET:");
 
     const pendingMigrations = await migrationRunner({
@@ -28,9 +27,8 @@ async function listPendingMigrations() {
 
 async function runPendingMigrations() {
   let dbClient;
-
   try {
-    const dbClient = await database.getNewClient();
+    dbClient = await database.getNewClient();
     console.log("POST:");
 
     const migratedMigrations = await migrationRunner({
