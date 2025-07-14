@@ -39,7 +39,7 @@ describe("POST /api/v1/users", () => {
       expect(Date.parse(resBody.updated_at)).not.toBeNaN();
     });
 
-    test("With duplicated email", async () => {
+    test("With duplicated 'email'", async () => {
       const res1 = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
@@ -66,6 +66,53 @@ describe("POST /api/v1/users", () => {
       });
 
       expect(res2.status).toBe(400);
+
+      const res2Body = await res2.json();
+
+      expect(res2Body).toEqual({
+        name: "ValidationError",
+        message: "O email informado já está sendo utilizado.",
+        action: "Utilize outro email para realizar o cadastro.",
+        status_code: 400,
+      });
+    });
+
+    test("With duplicated 'username'", async () => {
+      const res1 = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "usuarioduplicado1",
+          email: "duplicado@teste1.com",
+          password: "teste123",
+        }),
+      });
+      expect(res1.status).toBe(201);
+
+      const res2 = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "UsuarioDuplicado1",
+          email: "Duplicado@teste2.com",
+          password: "teste123",
+        }),
+      });
+
+      expect(res2.status).toBe(400);
+
+      const res2Body = await res2.json();
+
+      expect(res2Body).toEqual({
+        name: "ValidationError",
+        message: "O nome de usuario informado já está sendo utilizado.",
+        action: "Utilize outro nome de usuario para realizar o cadastro.",
+        status_code: 400,
+      });
     });
   });
 });
