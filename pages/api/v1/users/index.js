@@ -12,7 +12,6 @@ async function postHandler(req, res) {
   const userInputValues = req.body;
 
   const newUser = await user.create(userInputValues);
-  console.log("newUser: ", newUser);
 
   return res.status(201).json(newUser);
 }
