@@ -1,3 +1,4 @@
+import activation from "models/activation";
 import password from "models/password";
 import orchestrator from "tests/orchestrator";
 
@@ -9,6 +10,8 @@ beforeAll(async () => {
 });
 
 describe("Use case: Registration Flow (all successful)", () => {
+  let createdUserResBody;
+
   test("Create user account", async () => {
     const createdUserRes = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -24,7 +27,7 @@ describe("Use case: Registration Flow (all successful)", () => {
 
     expect(createdUserRes.status).toBe(201);
 
-    const createdUserResBody = await createdUserRes.json();
+    createdUserResBody = await createdUserRes.json();
 
     expect(createdUserResBody).toEqual({
       id: createdUserResBody.id,
@@ -36,7 +39,20 @@ describe("Use case: Registration Flow (all successful)", () => {
       updated_at: createdUserResBody.updated_at,
     });
   });
-  test("Receive activation email", async () => {});
+
+  test("Receive activation email", async () => {
+    const lastEmail = await orchestrator.getLastEmail();
+
+    const activationToken = await activation.findOneByUserId(
+      createdUserResBody.id,
+    );
+
+    expect(lastEmail.sender).toBe("<contato@fintab.com.br>");
+    expect(lastEmail.recipients[0]).toBe("<registration.flow@teste.com>");
+    expect(lastEmail.subject).toBe("Ative seu cadastro no FinTab!");
+    expect(lastEmail.text).toContain("RegistrationFlow");
+    expect(lastEmail.text).toContain(activationToken.id);
+  });
 
   test("Activate account", async () => {});
 
