@@ -67,7 +67,7 @@ function clearSessionCookie(res) {
 }
 
 async function injectAnonymousOrUser(req, res, next) {
-  if (req.cookies?.session_id) {
+  if (req.cookies.session_id) {
     await injectAuthenticatedUser(req);
     return next();
   }
@@ -106,9 +106,9 @@ function canRequest(feature) {
       return next();
     }
 
-    throw new ForbbidenError({
+    throw new ForbidenError({
       message: "Você não possui permissão para executar esta ação.",
-      action: `Verifique se o seu usuário possui a feature "${feature}`,
+      action: `Verifique se o seu usuário possui a feature "${feature}"`,
     });
   };
 }

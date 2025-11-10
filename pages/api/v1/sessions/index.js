@@ -36,8 +36,6 @@ async function postHandler(req, res) {
 }
 
 async function deleteHandler(req, res) {
-  console.log(req.cookies);
-
   const sessionToken = req.cookies.session_id;
 
   console.log(sessionToken);
