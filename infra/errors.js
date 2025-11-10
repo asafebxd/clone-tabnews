@@ -58,7 +58,7 @@ export class ValidationError extends Error {
   }
 }
 
-export class ForbbidenError extends Error {
+export class ForbidenError extends Error {
   constructor({ cause, message, action }) {
     super(message || "Acesso negado.", {
       cause,

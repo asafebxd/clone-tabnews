@@ -1,7 +1,9 @@
 import { createRouter } from "next-connect";
 import controller from "infra/controller";
 import authentication from "models/authentication";
+import authorization from "models/authorization";
 import session from "models/session";
+import { ForbidenError } from "infra/errors";
 
 const router = createRouter();
 
@@ -21,13 +23,24 @@ async function postHandler(req, res) {
 
   const newSession = await session.create(authenticatedUser.id);
 
+  if (!authorization.can(authenticatedUser, "create:session")) {
+    throw new ForbidenError({
+      message: "Você não possui permissão para fazer login.",
+      action: "Contate o suporte caso você acredite que isto seja um erro.",
+    });
+  }
+
   controller.setSessionCookie(newSession.token, res);
 
   return res.status(201).json(newSession);
 }
 
 async function deleteHandler(req, res) {
+  console.log(req.cookies);
+
   const sessionToken = req.cookies.session_id;
+
+  console.log(sessionToken);
 
   const sessionObject = await session.findOneValidByToken(sessionToken);
 

@@ -1,22 +1,22 @@
-import orchestratror from "tests/orchestrator";
+import orchestrator from "tests/orchestrator";
 import session from "models/session";
 import setCookieParser from "set-cookie-parser";
 
 import { version as uuidVersion } from "uuid";
 
 beforeAll(async () => {
-  await orchestratror.clearDatabase();
-  await orchestratror.runPendingMigrations();
+  await orchestrator.clearDatabase();
+  await orchestrator.runPendingMigrations();
 });
 
 describe("GET /api/v1/user", () => {
   describe("Default user", () => {
     test("With valid session", async () => {
-      const createdUser = await orchestratror.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithValidSession",
       });
 
-      const sessionObject = await orchestratror.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const res = await fetch("http://localhost:3000/api/v1/user", {
         headers: {
@@ -81,11 +81,11 @@ describe("GET /api/v1/user", () => {
         ),
       });
 
-      const createdUser = await orchestratror.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithSessionAboutToExpire",
       });
 
-      const sessionObject = await orchestratror.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser.id);
 
       jest.useRealTimers();
 
@@ -183,11 +183,11 @@ describe("GET /api/v1/user", () => {
       jest.useFakeTimers({
         now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS),
       });
-      const createdUser = await orchestratror.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithExpiredSession",
       });
 
-      const sessionObject = await orchestratror.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser.id);
 
       jest.useRealTimers();
 

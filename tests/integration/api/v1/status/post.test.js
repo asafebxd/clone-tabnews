@@ -1,7 +1,7 @@
-import orchestratror from "tests/orchestrator";
+import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
-  await orchestratror.waitForAllServices();
+  await orchestrator.waitForAllServices();
 });
 
 describe("POST /api/v1/status", () => {

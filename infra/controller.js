@@ -6,10 +6,10 @@ import {
   ValidationError,
   NotFoundError,
   UnauthorizedError,
-  ForbbidenError,
-  ForbiddenError,
+  ForbidenError,
 } from "infra/errors";
 import user from "models/user";
+import authorization from "models/authorization";
 
 function onNoMatchHandler(req, res) {
   const publicErrorObject = new MethodNotAllowedError();
@@ -27,7 +27,7 @@ function onErrorHandler(error, req, res) {
   if (
     error instanceof ValidationError ||
     error instanceof NotFoundError ||
-    error instanceof ForbbidenError
+    error instanceof ForbidenError
   ) {
     return res.status(error.statusCode).json(error);
   }
@@ -77,11 +77,11 @@ async function injectAnonymousOrUser(req, res, next) {
 }
 
 async function injectAuthenticatedUser(req) {
-  const sessionToken = req.cookies.session;
+  const sessionToken = req.cookies.session_id;
   const sessionObject = await session.findOneValidByToken(sessionToken);
   const userObject = await user.findOneById(sessionObject.user_id);
 
-  request.context = {
+  req.context = {
     ...req.context,
     user: userObject,
   };
@@ -102,7 +102,7 @@ function canRequest(feature) {
   return function canRequestMiddleware(req, res, next) {
     const userTryingToRequest = req.context.user;
 
-    if (userTryingToRequest.features.includes(feature)) {
+    if (authorization.can(userTryingToRequest, feature)) {
       return next();
     }
 

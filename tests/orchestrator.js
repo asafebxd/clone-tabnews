@@ -5,6 +5,7 @@ import database from "infra/database";
 import migrator from "models/migrator";
 import user from "models/user";
 import session from "models/session";
+import activation from "models/activation";
 
 const emailHttpUrl = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
@@ -65,9 +66,9 @@ async function runPendingMigrations() {
 async function createUser(userObject) {
   return await user.create({
     username:
-      userObject.username || faker.internet.username().replace(/[_.-]/g, ""),
-    email: userObject.email || faker.internet.email(),
-    password: userObject.password || "validpassword",
+      userObject?.username || faker.internet.username().replace(/[_.-]/g, ""),
+    email: userObject?.email || faker.internet.email(),
+    password: userObject?.password || "validpassword",
   });
 }
 
@@ -102,7 +103,11 @@ function extractUUId(text) {
   return match ? match[0] : null;
 }
 
-const orchestratror = {
+async function activateUser(inactiveUser) {
+  return await activation.activateUserByUserId(inactiveUser.id);
+}
+
+const orchestrator = {
   waitForAllServices,
   clearDatabase,
   runPendingMigrations,
@@ -111,5 +116,6 @@ const orchestratror = {
   deleteAllEmails,
   getLastEmail,
   extractUUId,
+  activateUser,
 };
-export default orchestratror;
+export default orchestrator;
