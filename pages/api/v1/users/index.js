@@ -14,6 +14,8 @@ async function postHandler(req, res) {
 
   const newUser = await user.create(userInputValues);
 
+  console.log(newUser.id);
+
   // 1. Criar o Token de Ativação
   const activationToken = await activation.create(newUser.id);
   await activation.sendEmailToUser(newUser, activationToken);

@@ -76,8 +76,6 @@ describe("DELETE /api/v1/sessions", () => {
         },
       });
       const resBody = await res.json();
-      console.log(resBody);
-
       expect(res.status).toBe(200);
 
       expect(resBody).toEqual({

@@ -16,8 +16,6 @@ describe("GET /api/v1/user", () => {
 
       const resBody = await res.json();
 
-      console.log(resBody);
-
       expect(res.status).toBe(403);
 
       expect(resBody).toEqual({
