@@ -194,8 +194,6 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
 
       const resBody = await res.json();
 
-      console.log(resBody);
-
       expect(resBody).toEqual({
         name: "ForbiddenError",
         message: "Você não possui permissão para executar esta ação.",
