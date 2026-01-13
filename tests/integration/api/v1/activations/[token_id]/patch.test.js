@@ -1,7 +1,6 @@
 import activation from "models/activation";
 import user from "models/user";
 import orchestrator from "tests/orchestrator";
-import jestConfig from "jest.config";
 import { version as uuidVersion } from "uuid";
 
 beforeAll(async () => {
@@ -143,6 +142,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
       expect(activatedUser.features).toEqual([
         "create:session",
         "read:session",
+        "update:user",
       ]);
     });
 
