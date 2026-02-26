@@ -1,15 +1,23 @@
-function can(user, feature) {
-    let authorized = false;
+function can(user, feature, resource) {
+  let authorized = false;
 
-    if (user.features.includes(feature)) {
-        authorized = true;
+  if (user.features.includes(feature)) {
+    authorized = true;
+  }
+
+  if (feature === "update:user" && resource) {
+    authorized = false;
+
+    if (user.id === resource.id) {
+      authorized = true;
     }
+  }
 
-    return authorized
+  return authorized;
 }
 
 const authorization = {
-    can
-}
+  can,
+};
 
-export default authorization
+export default authorization;

@@ -1,5 +1,4 @@
 import activation from "models/activation";
-import password from "models/password";
 import orchestrator from "tests/orchestrator";
 import webserver from "infra/webserver";
 import user from "models/user";
