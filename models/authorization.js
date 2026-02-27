@@ -109,16 +109,6 @@ function filterOutput(user, feature, resource) {
     });
   }
 
-  if (feature === "read:migration") {
-    return resource.map((migration) => {
-      return {
-        path: migration.path,
-        name: migration.name,
-        timestamp: migration.timestamp,
-      };
-    });
-  }
-
   if (feature === "read:status") {
     const output = {
       updated_at: resource.updated_at,
