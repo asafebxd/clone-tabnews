@@ -26,11 +26,11 @@ function DataResponse() {
   let openedConnections = "Loading...";
 
   if (!isLoading && data) {
-    const db = data.dependecies.database;
+    const db = data?.dependencies?.database;
     updatedAtText = new Date(data.updated_at).toLocaleString("pt-BR");
-    version = db.version;
-    maxConnections = db.max_connections;
-    openedConnections = db.opened_connections;
+    version = db?.version;
+    maxConnections = db?.max_connections;
+    openedConnections = db?.opened_connections;
   }
 
   return (

@@ -45,5 +45,6 @@ async function getHandler(req, res) {
     "read:status",
     statusObject,
   );
+
   res.status(200).json(secureOutputValues);
 }
