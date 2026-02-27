@@ -35,8 +35,6 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(createdUserResBody).toEqual({
       id: createdUserResBody.id,
       username: "RegistrationFlow",
-      email: "registration.flow@teste.com",
-      password: createdUserResBody.password,
       features: ["read:activation_token"],
       created_at: createdUserResBody.created_at,
       updated_at: createdUserResBody.updated_at,
