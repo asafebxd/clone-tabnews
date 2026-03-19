@@ -1,12 +1,12 @@
-import orchestratror from "tests/orchestrator";
+import orchestrator from "tests/orchestrator";
 import { version as uuidVersion } from "uuid";
 import user from "models/user";
 import password from "models/password";
 
 beforeAll(async () => {
-  await orchestratror.clearDatabase();
-  await orchestratror.waitForAllServices();
-  await orchestratror.runPendingMigrations();
+  await orchestrator.clearDatabase();
+  await orchestrator.waitForAllServices();
+  await orchestrator.runPendingMigrations();
 });
 
 describe("POST /api/v1/users", () => {
@@ -30,8 +30,7 @@ describe("POST /api/v1/users", () => {
       expect(resBody).toEqual({
         id: resBody.id,
         username: "teste",
-        email: "teste@teste.com",
-        password: resBody.password,
+        features: ["read:activation_token"],
         created_at: resBody.created_at,
         updated_at: resBody.updated_at,
       });
@@ -128,6 +127,38 @@ describe("POST /api/v1/users", () => {
         message: "O nome de usuario informado já está sendo utilizado.",
         action: "Utilize outro nome de usuario para realizar esta operação.",
         status_code: 400,
+      });
+    });
+  });
+
+  describe("Default user", () => {
+    test("With unique and valid data", async () => {
+      const user1 = await orchestrator.createUser();
+      await orchestrator.activateUser(user1);
+      const user1SessionObject = await orchestrator.createSession(user1.id);
+
+      const user2Res = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `session_id=${user1SessionObject.token}`,
+        },
+        body: JSON.stringify({
+          username: "usuariologado",
+          email: "usuariologado@teste.com",
+          password: "senha123",
+        }),
+      });
+
+      expect(user2Res.status).toBe(403);
+
+      const user2ResBody = await user2Res.json();
+
+      expect(user2ResBody).toEqual({
+        name: "ForbiddenError",
+        message: "Você não possui permissão para executar esta ação.",
+        action: 'Verifique se o seu usuário possui a feature "create:user"',
+        status_code: 403,
       });
     });
   });

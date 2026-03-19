@@ -6,7 +6,10 @@ import {
   ValidationError,
   NotFoundError,
   UnauthorizedError,
+  ForbidenError,
 } from "infra/errors";
+import user from "models/user";
+import authorization from "models/authorization";
 
 function onNoMatchHandler(req, res) {
   const publicErrorObject = new MethodNotAllowedError();
@@ -21,7 +24,11 @@ function onErrorHandler(error, req, res) {
   // ) {
   //   return res.status(error.statusCode).json(error);
   // }
-  if (error instanceof ValidationError || error instanceof NotFoundError) {
+  if (
+    error instanceof ValidationError ||
+    error instanceof NotFoundError ||
+    error instanceof ForbidenError
+  ) {
     return res.status(error.statusCode).json(error);
   }
 
@@ -33,6 +40,8 @@ function onErrorHandler(error, req, res) {
   const publicErrorObject = new InternalServerError({
     cause: error,
   });
+
+  console.error(publicErrorObject);
 
   res.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
@@ -59,6 +68,53 @@ function clearSessionCookie(res) {
   res.setHeader("Set-Cookie", setCookie);
 }
 
+async function injectAnonymousOrUser(req, res, next) {
+  if (req.cookies.session_id) {
+    await injectAuthenticatedUser(req);
+    return next();
+  }
+
+  injectAnonymousUser(req);
+  return next();
+}
+
+async function injectAuthenticatedUser(req) {
+  const sessionToken = req.cookies.session_id;
+  const sessionObject = await session.findOneValidByToken(sessionToken);
+  const userObject = await user.findOneById(sessionObject.user_id);
+
+  req.context = {
+    ...req.context,
+    user: userObject,
+  };
+}
+
+async function injectAnonymousUser(req) {
+  const anonymousUserObject = {
+    features: ["read:activation_token", "create:session", "create:user"],
+  };
+
+  req.context = {
+    ...req.context,
+    user: anonymousUserObject,
+  };
+}
+
+function canRequest(feature) {
+  return function canRequestMiddleware(req, res, next) {
+    const userTryingToRequest = req.context.user;
+
+    if (authorization.can(userTryingToRequest, feature)) {
+      return next();
+    }
+
+    throw new ForbidenError({
+      message: "Você não possui permissão para executar esta ação.",
+      action: `Verifique se o seu usuário possui a feature "${feature}"`,
+    });
+  };
+}
+
 const controller = {
   errorHandlers: {
     onNoMatch: onNoMatchHandler,
@@ -66,6 +122,8 @@ const controller = {
   },
   setSessionCookie,
   clearSessionCookie,
+  injectAnonymousOrUser,
+  canRequest,
 };
 
 export default controller;

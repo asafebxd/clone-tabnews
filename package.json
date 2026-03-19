@@ -4,7 +4,7 @@
   "description": "Programming training project",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && next dev",
+    "dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && (trap 'npm run services:stop' INT TERM ; next dev -p 3000)",
     "postdev": "npm run services:stop",
     "test": "npm run services:up  && concurrently -n next,jest --hide next -k -s command-jest \"next dev\"  \"jest --runInBand --verbose\"",
     "posttest": "npm run services:stop",
@@ -15,6 +15,7 @@
     "services:wait:database": "node infra/scripts/wait-for-postgres.js",
     "migrations:create": "node-pg-migrate -m infra/migrations create",
     "migrations:up": "node-pg-migrate -m infra/migrations --envPath .env.development up",
+    "migrations:up:dry": "node-pg-migrate -m infra/migrations --envPath .env.development --dry-run up",
     "build": "next build",
     "start": "next start",
     "lint:prettier:fix": "prettier --write .",
@@ -62,5 +63,8 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "engines": {
+    "node": "24"
   }
 }

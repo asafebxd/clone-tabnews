@@ -1,11 +1,11 @@
-import orchestratror from "tests/orchestrator";
+import orchestrator from "tests/orchestrator";
 import session from "models/session";
 import setCookieParser from "set-cookie-parser";
 // import { version as uuidVersion } from "uuid";
 
 beforeAll(async () => {
-  await orchestratror.clearDatabase();
-  await orchestratror.runPendingMigrations();
+  await orchestrator.clearDatabase();
+  await orchestrator.runPendingMigrations();
 });
 
 describe("DELETE /api/v1/sessions", () => {
@@ -20,10 +20,8 @@ describe("DELETE /api/v1/sessions", () => {
           Cookie: `session_id=${nonexistentToken}`,
         },
       });
-
-      expect(res.status).toBe(401);
-
       const resBody = await res.json();
+      expect(res.status).toBe(401);
 
       expect(resBody).toEqual({
         name: "UnauthorizedError",
@@ -39,11 +37,11 @@ describe("DELETE /api/v1/sessions", () => {
         now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS),
       });
 
-      const createdUser = await orchestratror.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithSessionExpired",
       });
 
-      const sessionObject = await orchestratror.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser.id);
 
       jest.useRealTimers();
 
@@ -67,9 +65,9 @@ describe("DELETE /api/v1/sessions", () => {
     });
 
     test("With valid session", async () => {
-      const createdUser = await orchestratror.createUser({});
+      const createdUser = await orchestrator.createUser();
 
-      const sessionObject = await orchestratror.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const res = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "DELETE",
@@ -77,10 +75,8 @@ describe("DELETE /api/v1/sessions", () => {
           Cookie: `session_id=${sessionObject.token}`,
         },
       });
-
-      expect(res.status).toBe(200);
-
       const resBody = await res.json();
+      expect(res.status).toBe(200);
 
       expect(resBody).toEqual({
         id: sessionObject.id,

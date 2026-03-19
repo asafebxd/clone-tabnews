@@ -1,22 +1,41 @@
-import orchestratror from "tests/orchestrator";
+import orchestrator from "tests/orchestrator";
 import session from "models/session";
 import setCookieParser from "set-cookie-parser";
 
 import { version as uuidVersion } from "uuid";
 
 beforeAll(async () => {
-  await orchestratror.clearDatabase();
-  await orchestratror.runPendingMigrations();
+  await orchestrator.clearDatabase();
+  await orchestrator.runPendingMigrations();
 });
 
 describe("GET /api/v1/user", () => {
+  describe("Anonymous user", () => {
+    test("Retrieving the endpoint", async () => {
+      const res = await fetch("http://localhost:3000/api/v1/user");
+
+      const resBody = await res.json();
+
+      expect(res.status).toBe(403);
+
+      expect(resBody).toEqual({
+        name: "ForbiddenError",
+        message: "Você não possui permissão para executar esta ação.",
+        action: 'Verifique se o seu usuário possui a feature "read:session"',
+        status_code: 403,
+      });
+    });
+  });
+
   describe("Default user", () => {
     test("With valid session", async () => {
-      const createdUser = await orchestratror.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithValidSession",
       });
 
-      const sessionObject = await orchestratror.createSession(createdUser.id);
+      const activatedUser = await orchestrator.activateUser(createdUser);
+
+      const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const res = await fetch("http://localhost:3000/api/v1/user", {
         headers: {
@@ -36,9 +55,9 @@ describe("GET /api/v1/user", () => {
         id: createdUser.id,
         username: "UserWithValidSession",
         email: createdUser.email,
-        password: createdUser.password,
-        created_at: createdUser.created_at.toISOString(),
-        updated_at: createdUser.updated_at.toISOString(),
+        features: ["create:session", "read:session", "update:user"],
+        created_at: activatedUser.created_at.toISOString(),
+        updated_at: activatedUser.updated_at.toISOString(),
       });
 
       expect(uuidVersion(resBody.id)).toBe(4);
@@ -80,11 +99,13 @@ describe("GET /api/v1/user", () => {
         ),
       });
 
-      const createdUser = await orchestratror.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithSessionAboutToExpire",
       });
 
-      const sessionObject = await orchestratror.createSession(createdUser.id);
+      const activatedUser = await orchestrator.activateUser(createdUser);
+
+      const sessionObject = await orchestrator.createSession(createdUser.id);
 
       jest.useRealTimers();
 
@@ -106,9 +127,9 @@ describe("GET /api/v1/user", () => {
         id: createdUser.id,
         username: "UserWithSessionAboutToExpire",
         email: createdUser.email,
-        password: createdUser.password,
-        created_at: createdUser.created_at.toISOString(),
-        updated_at: createdUser.updated_at.toISOString(),
+        features: ["create:session", "read:session", "update:user"],
+        created_at: activatedUser.created_at.toISOString(),
+        updated_at: activatedUser.updated_at.toISOString(),
       });
 
       expect(uuidVersion(resBody.id)).toBe(4);
@@ -181,11 +202,11 @@ describe("GET /api/v1/user", () => {
       jest.useFakeTimers({
         now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS),
       });
-      const createdUser = await orchestratror.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithExpiredSession",
       });
 
-      const sessionObject = await orchestratror.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser.id);
 
       jest.useRealTimers();
 

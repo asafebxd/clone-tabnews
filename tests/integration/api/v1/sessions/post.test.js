@@ -1,18 +1,18 @@
-import orchestratror from "tests/orchestrator";
+import orchestrator from "tests/orchestrator";
 import setCookieParser from "set-cookie-parser";
 import { version as uuidVersion } from "uuid";
 import session from "models/session";
 
 beforeAll(async () => {
-  await orchestratror.clearDatabase();
-  await orchestratror.waitForAllServices();
-  await orchestratror.runPendingMigrations();
+  await orchestrator.clearDatabase();
+  await orchestrator.waitForAllServices();
+  await orchestrator.runPendingMigrations();
 });
 
 describe("POST /api/v1/sessions", () => {
   describe("Anonymous user", () => {
     test("With incorrect `email` but correct `password`", async () => {
-      await orchestratror.createUser({
+      await orchestrator.createUser({
         password: "senha-correta",
       });
 
@@ -39,7 +39,7 @@ describe("POST /api/v1/sessions", () => {
     });
 
     test("With correct `email` but incorrect `password`", async () => {
-      await orchestratror.createUser({
+      await orchestrator.createUser({
         email: "email.correto@teste.com",
       });
 
@@ -66,7 +66,7 @@ describe("POST /api/v1/sessions", () => {
     });
 
     test("With incorrect `email` and incorrect `password`", async () => {
-      await orchestratror.createUser({});
+      await orchestrator.createUser({});
 
       const res = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "POST",
@@ -91,10 +91,12 @@ describe("POST /api/v1/sessions", () => {
     });
 
     test("With correct `email` and correct `password`", async () => {
-      const createdUser = await orchestratror.createUser({
+      const createdUser = await orchestrator.createUser({
         email: "tudo.correto@teste.com",
         password: "tudocorreto",
       });
+
+      await orchestrator.activateUser(createdUser);
 
       const res = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "POST",
@@ -106,6 +108,7 @@ describe("POST /api/v1/sessions", () => {
           password: "tudocorreto",
         }),
       });
+
       expect(res.status).toBe(201);
 
       const resBody = await res.json();

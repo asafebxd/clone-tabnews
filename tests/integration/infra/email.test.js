@@ -1,13 +1,13 @@
 import email from "infra/email";
-import orchestratror from "tests/orchestrator";
+import orchestrator from "tests/orchestrator";
 
 describe("infra/email.js", () => {
   test("send()", async () => {
-    await orchestratror.deleteAllEmails();
+    await orchestrator.deleteAllEmails();
 
     await email.send({
       from: "Asafe <contato@teste.com.br>",
-      to: "contato@urso.dev",
+      to: "contato@curso.dev",
       subject: "Teste de assunto",
       text: "Teste de corpo.",
     });
@@ -19,7 +19,7 @@ describe("infra/email.js", () => {
       text: "Corpo do último email.",
     });
 
-    const lastEmail = await orchestratror.getLastEmail();
+    const lastEmail = await orchestrator.getLastEmail();
 
     expect(lastEmail.sender).toBe("<contato@teste.com.br>");
     expect(lastEmail.recipients[0]).toBe("<contato@curso.dev>");
