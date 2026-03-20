@@ -41,8 +41,6 @@ function onErrorHandler(error, req, res) {
     cause: error,
   });
 
-  console.error(publicErrorObject);
-
   res.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 

@@ -9,7 +9,7 @@ beforeAll(async () => {
 describe("POST /api/v1/migrations", () => {
   describe("Anonymous user", () => {
     describe("Running pending migrations", () => {
-      test.skip("For the first time", async () => {
+      test("For the first time", async () => {
         const res = await fetch("http://localhost:3000/api/v1/migrations", {
           method: "POST",
         });
@@ -30,7 +30,7 @@ describe("POST /api/v1/migrations", () => {
 
   describe("Default user", () => {
     describe("Running pending migrations", () => {
-      test.skip("For the first time", async () => {
+      test("For the first time", async () => {
         const createdUser = await orchestrator.createUser({});
         const activatedUser = await orchestrator.activateUser(createdUser);
         const sessionObject = await orchestrator.createSession(
@@ -61,7 +61,7 @@ describe("POST /api/v1/migrations", () => {
 
   describe("Privileged user", () => {
     describe("Running pending migrations", () => {
-      test.skip("For the first time", async () => {
+      test("For the first time", async () => {
         const privilegedUser = await orchestrator.createUser({});
         const activatedUser = await orchestrator.activateUser(privilegedUser);
         await orchestrator.addFeaturesToUser(privilegedUser, [
