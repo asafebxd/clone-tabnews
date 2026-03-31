@@ -1,4 +1,5 @@
 import orchestrator from "tests/orchestrator";
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.clearDatabase();
@@ -9,7 +10,7 @@ beforeAll(async () => {
 describe("GET /api/v1/migrations", () => {
   describe("Anonymous user", () => {
     test("Retrieving  pending migrations", async () => {
-      const res = await fetch("http://localhost:3000/api/v1/migrations");
+      const res = await fetch(`${webserver.origin}/api/v1/migrations`);
       expect(res.status).toBe(403);
 
       const resBody = await res.json();
@@ -29,7 +30,7 @@ describe("GET /api/v1/migrations", () => {
       const activatedUser = await orchestrator.activateUser(createdUser);
       const sessionObject = await orchestrator.createSession(activatedUser.id);
 
-      const res = await fetch("http://localhost:3000/api/v1/migrations", {
+      const res = await fetch(`${webserver.origin}/api/v1/migrations`, {
         headers: {
           "Content-Type": "application/json",
           Cookie: `session_id=${sessionObject.token}`,
@@ -57,7 +58,7 @@ describe("GET /api/v1/migrations", () => {
         activatedUser.id,
       );
 
-      const res = await fetch("http://localhost:3000/api/v1/migrations", {
+      const res = await fetch(`${webserver.origin}/api/v1/migrations`, {
         headers: {
           "Content-Type": "application/json",
           Cookie: `session_id=${privilegedUserSession.token}`,

@@ -1,3 +1,4 @@
+import webserver from "infra/webserver";
 import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
@@ -10,9 +11,10 @@ describe("POST /api/v1/migrations", () => {
   describe("Anonymous user", () => {
     describe("Running pending migrations", () => {
       test("For the first time", async () => {
-        const res = await fetch("http://localhost:3000/api/v1/migrations", {
+        const res = await fetch(`${webserver.origin}/api/v1/migrations`, {
           method: "POST",
         });
+
         expect(res.status).toBe(403);
 
         const resBody = await res.json();
@@ -37,7 +39,7 @@ describe("POST /api/v1/migrations", () => {
           activatedUser.id,
         );
 
-        const res = await fetch("http://localhost:3000/api/v1/migrations", {
+        const res = await fetch(`${webserver.origin}/api/v1/migrations`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -71,7 +73,7 @@ describe("POST /api/v1/migrations", () => {
           activatedUser.id,
         );
 
-        const res = await fetch("http://localhost:3000/api/v1/migrations", {
+        const res = await fetch(`${webserver.origin}/api/v1/migrations`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
