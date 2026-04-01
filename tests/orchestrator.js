@@ -1,5 +1,5 @@
 import retry from "async-retry";
-import { faker } from "@faker-js/faker/.";
+import { faker } from "@faker-js/faker";
 
 import webserver from "infra/webserver";
 import database from "infra/database";
